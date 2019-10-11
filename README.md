@@ -196,4 +196,5 @@ The recurrent of KBQA by using Mysql to storage the triple data, using Bert for 
 
          ![image-20191011094817373](https://tva1.sinaimg.cn/large/006y8mN6gy1g7u19falb8j30kl0163yl.jpg)
 
-9. Original artical: https://github.com/WenRichard/KBQA-BERT
+9. Original artical: https://github.com/WenRichard/KBQA-BERT ，https://zhuanlan.zhihu.com/p/62946533
+10. Paper：http://www.doc88.com/p-9095635489643.html
