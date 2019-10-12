@@ -198,3 +198,34 @@ The recurrent of KBQA by using Mysql to storage the triple data, using Bert for 
 
 9. Original artical: https://github.com/WenRichard/KBQA-BERT ，https://zhuanlan.zhihu.com/p/62946533
 10. Paper：http://www.doc88.com/p-9095635489643.html
+11. 技术细节分析：
+
+    * 基于知识图谱的自动问答拆分为2 个主要步骤:**命名实体识别步骤**和**属性映射步骤**。其中，实体识别步骤的目的是找到问句中询问的实体名称，而属性映射步骤的目的在于找到问句中询问的相关属性。
+
+      * 命名实体识别：基于Bert+BiLSTM+CRF 的方法，另外加上一些规则的映射，提高覆盖度。
+
+        * 采用BIO标注法。只需要识别出实体便可，包括人名，地名，机构名都囊括为统一的标签B-LOC, I-LOC。
+        * 与以前一样的训练过程。
+
+      * 属性映射：将其转换为文本相似度的问题，采用Bert作二元分类训练模型。
+
+        * 数据集构造：
+
+          * 构造测试集的整体关系集合，提取+去重，获得 4373 个关系 RelationList；
+          * 一个 sample 由“问题+关系+Label”构成，原始数据中的关系值置为 1；
+          * 从 RelationList 中随机抽取五个属性作为 Negative Samples（反例）；
+          * question-triple相似度训练集如下：
+
+          ![image-20191011145928092](https://tva1.sinaimg.cn/large/006y8mN6gy1g7u9rcml72j30ea029q4q.jpg)
+
+        * 模型架构：
+
+          * 1、 实体检索:输入问题，ner得出实体集合，在数据库中检索与输入实体相关的所有三元
+
+          * 2、 属性映射——bert分类/文本相似度
+
+            - 非语义匹配：如果所得三元组的关系(attribute)属性是 输入问题 字符串的子集，将所得三元组的答案(answer)属性与正确答案匹配，correct +1
+
+            - 语义匹配：利用bert计算输入问题(input question)与所得三元组的关系(attribute)属性的相似度，将最相似的三元组的答案作为答案，并与正确的答案进行匹配，correct +1
+
+          * 3、 答案组合与返回答案。
